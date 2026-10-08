@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wobbly Buildings: Vibration Mode Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fdf8ec;--grid:#e9e0c8;--card:#fff;--ink:#1d2b4f;--soft:#5b6585;--line:#d9d2bd;--c1:#ef6b5b;--c2:#f2b630;--c3:#2bb39a;--sky:#dff1fb;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a2e;--grid:#1e2640;--card:#1d2540;--ink:#f4efe0;--soft:#a5afcf;--line:#34406a;--sky:#1b3550}}
+:root[data-theme="dark"]{--bg:#141a2e;--grid:#1e2640;--card:#1d2540;--ink:#f4efe0;--soft:#a5afcf;--line:#34406a;--sky:#1b3550}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;color:var(--ink);font:600 16px/1.55 Nunito,system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+h1,h2,h3{font-family:Fredoka,Nunito,sans-serif;margin:0;line-height:1.15}
+h1{font-size:clamp(30px,6vw,52px);font-weight:700}
+h2{font-size:24px;margin-bottom:6px}
+.hero{padding:18px 0 8px}
+.hero p{max-width:60ch;color:var(--soft);font-size:18px;margin:10px 0 0}
+.card{background:var(--card);border:2.5px solid var(--ink);border-radius:20px;padding:18px;margin-top:20px;box-shadow:5px 5px 0 var(--ink)}
+.step{display:inline-block;background:var(--c2);color:#1d2b4f;font-family:Fredoka;font-weight:700;border-radius:99px;padding:2px 12px;margin-bottom:8px;font-size:14px}
+.note{color:var(--soft);margin:0 0 12px;max-width:68ch}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.sl{margin:10px 0}
+.sl label{display:flex;justify-content:space-between;gap:8px;font-weight:800}
+.sl output{font-family:Fredoka;color:var(--c1)}
+input[type=range]{width:100%;accent-color:var(--c1);height:28px}
+.tag{font-family:Fredoka;font-size:17px;margin:14px 0 2px}
+.tip{background:var(--sky);border:2px dashed var(--ink);border-radius:14px;padding:10px 14px;margin-top:12px;min-height:3.4em}
+button{font:inherit;font-family:Fredoka;font-weight:700;border:2.5px solid var(--ink);background:var(--card);color:var(--ink);border-radius:14px;padding:8px 16px;cursor:pointer;box-shadow:3px 3px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+button:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--c3);outline-offset:2px}
+button.on{background:var(--c1);color:#fff}
+.modes{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+#stage{width:100%;max-width:380px;display:block;margin:0 auto;background:linear-gradient(#bfe6f7,#eaf8ff);border:2.5px solid var(--ink);border-radius:16px}
+.say{font-size:18px;min-height:3.2em;margin:10px 0 0}
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.res{grid-template-columns:1fr}}
+.mc{border:2.5px solid var(--line);border-radius:16px;padding:12px;cursor:pointer;background:var(--card);color:var(--ink);text-align:left;box-shadow:none;font-family:Nunito;font-weight:600;width:100%}
+.mc.on{border-color:var(--ink);box-shadow:4px 4px 0 var(--ink)}
+.mc h3{font-size:19px}
+.big{font-family:Fredoka;font-size:30px;font-weight:700;color:var(--c1)}
+.sub{font-size:14px;color:var(--soft)}
+.bars{margin-top:8px}
+.bar{display:flex;align-items:center;gap:6px;font-size:13px;margin:3px 0}
+.bar span{width:52px}
+.track{flex:1;height:14px;position:relative;background:var(--grid);border-radius:7px}
+.track:after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:var(--ink)}
+.fill{position:absolute;top:1px;bottom:1px;border-radius:6px}
+.idea{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.idea{grid-template-columns:1fr}}
+.idea div{border-radius:16px;padding:14px;border:2.5px solid var(--ink)}
+.idea .a{background:var(--c2);color:#1d2b4f}.idea .b{background:var(--c3);color:#06241e}
+.idea b{font-family:Fredoka;font-size:20px;display:block}
+.math{font-family:Fredoka;font-size:20px;text-align:center;margin:14px 0 4px}
+.warn{font-size:14px;color:var(--soft);margin-top:14px}
+@media(prefers-reduced-motion:reduce){button{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+<h1>Why do buildings wobble? 🏢</h1>
+<p>Every building has its own favourite ways to shake. Build a 3-floor building below, change it, and watch the wobble change!</p>
+</header>
+
+<section class="card">
+<span class="step">Step 1</span>
+<h2>Build your building</h2>
+<p class="note">Floor 1 is at the bottom. Move the sliders and see what happens.</p>
+<div class="grid2">
+<div>
+<div class="tag">⚖️ How heavy is each floor?</div>
+<div class="sl"><label>Floor 1 <output id="o_m1"></output></label><input type="range" id="m1" min="500" max="3000" step="100" value="1000"></div>
+<div class="sl"><label>Floor 2 <output id="o_m2"></output></label><input type="range" id="m2" min="500" max="3000" step="100" value="1000"></div>
+<div class="sl"><label>Floor 3 <output id="o_m3"></output></label><input type="range" id="m3" min="500" max="3000" step="100" value="1000"></div>
+</div>
+<div>
+<div class="tag">💪 How stiff are the walls (the "springs")?</div>
+<div class="sl"><label>Ground to floor 1 <output id="o_k1"></output></label><input type="range" id="k1" min="5000" max="60000" step="1000" value="20000"></div>
+<div class="sl"><label>Floor 1 to floor 2 <output id="o_k2"></output></label><input type="range" id="k2" min="5000" max="60000" step="1000" value="20000"></div>
+<div class="sl"><label>Floor 2 to floor 3 <output id="o_k3"></output></label><input type="range" id="k3" min="5000" max="60000" step="1000" value="20000"></div>
+</div>
+</div>
+<div class="tip" id="tip">Try making floor 3 much heavier. What do you think will happen to the wobble speed?</div>
+<p style="margin:12px 0 0"><button id="reset">Reset building</button></p>
+</section>
+
+<section class="card">
+<span class="step">Step 2</span>
+<h2>Watch it wobble</h2>
+<p class="note">Pick a mode. Each mode is one special way the building likes to shake. (Slowed down so your eyes can follow.)</p>
+<div class="grid2">
+<div>
+<div class="modes" id="modeBtns"></div>
+<svg id="stage" viewBox="0 0 320 380" role="img" aria-label="Animated three floor building"></svg>
+</div>
+<div>
+<h3 id="mTitle"></h3>
+<p class="say" id="mSay"></p>
+<div class="sl"><label>Wobble size <output id="o_amp"></output></label><input type="range" id="amp" min="0.3" max="1.3" step="0.1" value="1"></div>
+<div class="sl"><label>Slow-motion speed <output id="o_spd"></output></label><input type="range" id="spd" min="0.3" max="2" step="0.1" value="1"></div>
+<div class="tip">👀 Look at the springs: thicker spring = stiffer wall. Wider floor = heavier floor.</div>
+</div>
+</div>
+</section>
+
+<section class="card">
+<span class="step">Step 3</span>
+<h2>Your results</h2>
+<p class="note">Tap a card to watch that mode. Bars show how far each floor moves: left or right of the middle line.</p>
+<div class="res" id="res"></div>
+<div class="warn">Heads up: this is a simple classroom model. It helps us understand how buildings vibrate, but it can't tell if a real building would survive an earthquake.</div>
+</section>
+
+<section class="card">
+<span class="step">The big idea</span>
+<h2>Two words to remember</h2>
+<div class="idea">
+<div class="a"><b>Eigenvalue = HOW FAST</b>It tells us the natural frequency: how many times per second the building likes to wobble.</div>
+<div class="b"><b>Eigenvector = HOW IT MOVES</b>It tells us the shape of the wobble: which floors go left, which go right, and by how much.</div>
+</div>
+<div class="math">K · v = ω² · M · v</div>
+<p class="note" style="text-align:center;margin:0 auto">K = stiffness (how hard the walls push back), M = mass (how heavy), ω² = the eigenvalue, v = the eigenvector (mode shape). The computer solves this for you every time you move a slider.</p>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const DEF={m1:1000,m2:1000,m3:1000,k1:20000,k2:20000,k3:20000};
+const ids=Object.keys(DEF);
+let S={...DEF}, modes=[], cur=0, prevF1=null;
+const COL=['#ef6b5b','#f2b630','#2bb39a'];
+
+function jacobi(A){
+  const n=3,V=[[1,0,0],[0,1,0],[0,0,1]];
+  for(let it=0;it<60;it++){
+    let p=0,q=1,mx=Math.abs(A[0][1]);
+    for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(Math.abs(A[i][j])>mx){mx=Math.abs(A[i][j]);p=i;q=j}
+    if(mx<1e-10)break;
+    const th=(A[q][q]-A[p][p])/(2*A[p][q]);
+    const t=Math.sign(th||1)/(Math.abs(th)+Math.sqrt(th*th+1));
+    const c=1/Math.sqrt(t*t+1),s=t*c;
+    for(let k=0;k<n;k++){const a=A[k][p],b=A[k][q];A[k][p]=c*a-s*b;A[k][q]=s*a+c*b}
+    for(let k=0;k<n;k++){const a=A[p][k],b=A[q][k];A[p][k]=c*a-s*b;A[q][k]=s*a+c*b}
+    for(let k=0;k<n;k++){const a=V[k][p],b=V[k][q];V[k][p]=c*a-s*b;V[k][q]=s*a+c*b}
+  }
+  return [0,1,2].map(i=>({l:A[i][i],u:[V[0][i],V[1][i],V[2][i]]})).sort((a,b)=>a.l-b.l);
+}
+function solve(){
+  const {m1,m2,m3,k1,k2,k3}=S, m=[m1,m2,m3];
+  const K=[[k1+k2,-k2,0],[-k2,k2+k3,-k3],[0,-k3,k3]];
+  // turn K v = λ M v into an ordinary problem: A = M^-1/2 K M^-1/2
+  const A=K.map((r,i)=>r.map((x,j)=>x/Math.sqrt(m[i]*m[j])));
+  return jacobi(A).map(e=>{
+    let v=e.u.map((x,i)=>x/Math.sqrt(m[i]));
+    const mx=Math.max(...v.map(Math.abs));
+    v=v.map(x=>x/mx);
+    if(v[2]<0)v=v.map(x=>-x);
+    const w=Math.sqrt(e.l);
+    return {l:e.l,w,f:w/(2*Math.PI),v};
+  });
+}
+function describe(v){
+  const sg=v.map(x=>Math.abs(x)<0.05?0:Math.sign(x));
+  let ch=0;for(let i=1;i<3;i++)if(sg[i]&&sg[i-1]&&sg[i]!==sg[i-1])ch++;
+  if(ch===0)return["Everyone sways together","All floors lean the same way, like a tall tree in the wind. The top floor moves the most."];
+  if(ch===1)return["Top and bottom fight","Some floors go left while others go right, so the building bends like a letter S."];
+  return["The zig-zag wobble","Floors take turns: right, left, right. It is the fastest and trickiest shake."];
+}
+function barsHTML(v){
+  return v.map((x,i)=>{
+    const w=Math.abs(x)*50, side=x>=0?`left:50%;width:${w}%`:`left:${50-w}%;width:${w}%`;
+    return `<div class="bar"><span>Floor ${i+1}</span><div class="track"><div class="fill" style="${side};background:${COL[i]}"></div></div></div>`;
+  }).join('');
+}
+function renderStatic(){
+  $('modeBtns').innerHTML=modes.map((_,i)=>`<button class="${i===cur?'on':''}" data-i="${i}">Mode ${i+1}</button>`).join('');
+  $('res').innerHTML=modes.map((m,i)=>{
+    const d=describe(m.v);
+    return `<button class="mc ${i===cur?'on':''}" data-i="${i}"><h3>Mode ${i+1}: ${d[0]}</h3>
+    <div class="big">${m.f.toFixed(2)} Hz</div>
+    <div class="sub">${(1/m.f).toFixed(2)} s per wobble · eigenvalue λ = ${Math.round(m.l)} · ω = ${m.w.toFixed(1)} rad/s</div>
+    <div class="bars">${barsHTML(m.v)}</div></button>`;
+  }).join('');
+  const d=describe(modes[cur].v);
+  $('mTitle').textContent=`Mode ${cur+1}: ${d[0]}`;
+  $('mSay').textContent=d[1]+` It wobbles ${modes[cur].f.toFixed(2)} times every second.`;
+}
+function tipFor(changed){
+  const f=modes[0].f;
+  if(prevF1==null||!changed){prevF1=f;return}
+  const up=f>prevF1*1.001, down=f<prevF1*0.999;
+  let t;
+  if(changed[0]==='m') t=up?"Lighter floor → the building wobbles faster. Less weight is easier to swing!":down?"Heavier floor → the building wobbles slower. Heavy things are lazy to swing, like a big bell.":"No change in speed this time.";
+  else t=up?"Stiffer walls → the building wobbles faster. Stiff springs snap back quickly!":down?"Softer walls → the building wobbles slower. Bendy things sway lazily.":"No change in speed this time.";
+  $('tip').textContent=`Mode 1 is now ${f.toFixed(2)} Hz (it was ${prevF1.toFixed(2)}). ${t}`;
+  prevF1=f;
+}
+function update(changed){
+  ids.forEach(k=>{ $('o_'+k).textContent=S[k]+(k[0]==='m'?' kg':' N/m') });
+  modes=solve(); renderStatic(); tipFor(changed);
+}
+ids.forEach(k=>$(k).addEventListener('input',e=>{S[k]=+e.target.value;update(k)}));
+$('reset').onclick=()=>{ids.forEach(k=>{S[k]=DEF[k];$(k).value=DEF[k]});prevF1=null;update();$('tip').textContent="Back to the starting building. Try changing just one slider!"};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-i]');if(b){cur=+b.dataset.i;t0=null;renderStatic()}});
+['amp','spd'].forEach(id=>$(id).addEventListener('input',()=>{$('o_amp').textContent=$('amp').value+'x';$('o_spd').textContent=$('spd').value+'x'}));
+$('o_amp').textContent='1x';$('o_spd').textContent='1x';
+
+// --- animated building ---
+const svg=$('stage'), CX=160, GY=340;
+let t0=null;
+function zig(x1,y1,x2,y2,w){
+  const n=8,pts=[[x1,y1]];
+  for(let i=1;i<n;i++){const t=i/n;pts.push([x1+(x2-x1)*t+(i%2?-7:7),y1+(y2-y1)*t])}
+  pts.push([x2,y2]);
+  return `<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#1d2b4f" stroke-width="${w}" stroke-linejoin="round"/>`;
+}
+function frame(ts){
+  if(t0==null)t0=ts;
+  const m=modes[cur];
+  if(m){
+    const t=(ts-t0)/1000, A=45*(+$('amp').value);
+    const wv=2*(m.w/modes[0].w)*(+$('spd').value);
+    const ph=Math.sin(wv*t);
+    const dx=[0,...m.v.map(x=>x*A*ph)];
+    const ms=[S.m1,S.m2,S.m3], ks=[S.k1,S.k2,S.k3];
+    let g=`<rect x="0" y="${GY}" width="320" height="40" fill="#6b4f2a"/><rect x="0" y="${GY}" width="320" height="8" fill="#3f9a4a"/>`;
+    for(let i=1;i<=3;i++){
+      const loY=i===1?GY:GY-100*(i-1), hiY=GY-100*i+36;
+      const w=ks[i-1]/60000*5+1.5;
+      [-45,45].forEach(o=>{g+=zig(CX+o+dx[i-1],loY,CX+o+dx[i],hiY,w)});
+    }
+    for(let i=1;i<=3;i++){
+      const w=80+ms[i-1]/3000*70, x=CX-w/2+dx[i], y=GY-100*i;
+      g+=`<rect x="${x}" y="${y}" width="${w}" height="36" rx="8" fill="${COL[i-1]}" stroke="#1d2b4f" stroke-width="3"/>`;
+      g+=`<rect x="${x+w*0.2}" y="${y+9}" width="14" height="14" rx="3" fill="#fff" stroke="#1d2b4f" stroke-width="2"/><rect x="${x+w*0.6}" y="${y+9}" width="14" height="14" rx="3" fill="#fff" stroke="#1d2b4f" stroke-width="2"/>`;
+      g+=`<text x="${x+w/2}" y="${y-5}" text-anchor="middle" font-family="Fredoka,sans-serif" font-size="12" fill="#1d2b4f">F${i} · ${ms[i-1]} kg</text>`;
+    }
+    g+=`<text x="12" y="30" font-family="Fredoka,sans-serif" font-size="16" fill="#1d2b4f">Mode ${cur+1}</text>`;
+    svg.innerHTML=g;
+  }
+  requestAnimationFrame(frame);
+}
+update();requestAnimationFrame(frame);
+</script>
+</body>
+</html>
